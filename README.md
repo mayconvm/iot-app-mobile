@@ -3,6 +3,13 @@
 # Start project
 npm start
 
+
+# Libs
+
+* react-native-drawer-menu - https://github.com/Tinysymphony/react-native-drawer-menu
+* react-native-scripts - https://www.npmjs.com/package/react-native-scripts
+
+
 # TODO
 
 * Criar bootstrap da aplicação - OK
