@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Easing, StyleSheet, Text, View, Alert } from 'react-native';
 import ButtonAction from "./src/component/ButtonAction";
 import Drawer from './src/component/Drawer/index.js';
+import { Client, Message } from 'react-native-paho-mqtt';
+
 
 const styles = StyleSheet.create({
   container: {
@@ -34,6 +36,56 @@ export default class App extends React.Component {
       main: {} // style of main board
     };
 
+    //Set up an in-memory alternative to global localStorage
+    const myStorage = {
+      setItem: (key, item) => {
+        myStorage[key] = item;
+      },
+      getItem: (key) => myStorage[key],
+      removeItem: (key) => {
+        delete myStorage[key];
+      },
+    };
+
+    const client = new Client({ uri: 'ws://iot.eclipse.org:80/ws', clientId: 't-maycon', storage: myStorage });
+
+    // set event handlers
+    client.on('connectionLost', (responseObject) => {
+      if (responseObject.errorCode !== 0) {
+        console.log(responseObject.errorMessage);
+      }
+    });
+
+    client.on('messageReceived', (message) => {
+      console.log(message.payloadString);
+    });
+
+    // connect the client
+    client.connect()
+      .then(() => {
+        // Once a connection has been made, make a subscription and send a message.
+        console.log('onConnect');
+        return client.subscribe('t-maycon');
+      })
+      .then(() => {
+        const message = new Message('Hello');
+        message.destinationName = 't-maycon';
+        client.send(message);
+      })
+      .catch((responseObject) => {
+        if (responseObject.errorCode !== 0) {
+          console.log('onConnectionLost:' + responseObject.errorMessage);
+        }
+      })
+
+    const onPress = (clientMqqt) => {
+      return () => {
+        let message = new Message('Hello-click-button');
+        message.destinationName = 't-maycon';
+        clientMqqt.send(message);
+      }
+    }
+
     return (
       <Drawer
       style={styles.container}
@@ -47,7 +99,7 @@ export default class App extends React.Component {
       easingFunc={Easing.ease}
     >
       <View style={styles.container}>
-        <ButtonAction onPress={() => Alert.alert("OK")} title="Clique aqui" />
+        <ButtonAction onPress={onPress(client)} title="Clique aqui" />
         <Text>Open up App.js to start working on your app!</Text>
         <Text>Changes you make will automatically reload.</Text>
         <Text>Shake your phone to open the developer menu.</Text>
