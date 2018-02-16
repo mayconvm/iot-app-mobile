@@ -1,39 +1,41 @@
 import React, { Component } from 'react';
 import { Easing, StyleSheet, Text, View, Alert } from 'react-native';
 import ButtonAction from "./src/component/ButtonAction";
+import SliderMenu from "./src/component/SliderMenu";
 import Drawer from './src/component/Drawer/index.js';
 import { Client, Message } from 'react-native-paho-mqtt';
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
-});
+
 
 export default class App extends React.Component {
 
   render() {
 
-    var drawerContent = (<View style={styles.drawerContent}>
-      <View style={styles.leftTop}/>
-      <View style={styles.leftBottom}>
-        <View><Text>Drawer Content</Text></View>
-      </View>
-    </View>);
+    const styles = StyleSheet.create({
+      container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }
+    });
+
+    var drawerContent = (<SliderMenu />);
     
     // customize drawer's style (Optional)
     var customStyles = {
       drawer: {
+        flex: 1,
+        backgroundColor: 'green',
         shadowColor: '#000',
         shadowOpacity: 0.4,
         shadowRadius: 10
       },
       mask: {}, // style of mask if it is enabled
-      main: {} // style of main board
+      main: {
+        flex: 1
+      } // style of main board
     };
 
     //Set up an in-memory alternative to global localStorage
@@ -92,7 +94,7 @@ export default class App extends React.Component {
       drawerWidth={300}
       drawerContent={drawerContent}
       type={Drawer.types.Default}
-      customStyles={{drawer: styles.drawer}}
+      customStyles={customStyles}
       drawerPosition={Drawer.positions.Left}
       onDrawerOpen={() => {console.log('Drawer is opened');}}
       onDrawerClose={() => {console.log('Drawer is closed')}}
